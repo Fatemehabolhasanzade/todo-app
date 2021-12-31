@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
+import { getFirestore, collection } from 'firebase/firestore/lite';
 const firebaseConfig = {
     apiKey: "AIzaSyBUD50YTeeTIC2tzGSt_qXVxzknPr7xD5g",
     authDomain: "todo-app-2ac27.firebaseapp.com",
@@ -11,5 +11,7 @@ const firebaseConfig = {
 };
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const taskCol = collection(db, "TodoTask")
 
-export { db };
+
+export { db, app, taskCol };

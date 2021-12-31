@@ -3,37 +3,42 @@ import React, { useState, useEffect } from "react";
 import { TextField, Button } from "@mui/material";
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
-import 'firebase/compat/firestore';
-import { db } from "./firebase-config";
+import { addDoc, getDocs, Timestamp, serverTimestamp } from 'firebase/firestore';
+import { db, app, taskCol } from "./firebase-config";
 
 function App() {
   const [task, setTask] = useState("");
   const [taskList, setTaskList] = useState("");
-  // useEffect(() => {
-  //   getTasks();
-  // }, [task])
+  useEffect(() => {
+    getTasks();
+  }, [task])
 
-  const addTask = (e) => {
+  const addTask = async (e) => {
     e.preventDefault();
     console.log("you are trying to add a task");
-    db.collection("TodoTasks").add({
+    const newDoc = await addDoc(taskCol, {
       inProgress: true,
-      Timestamp: firebase.firestore.FieldValue.sreverTimeStamp(),
-      Task: task
-    })
+      // Timestamp: firebase.firestore.Timestamp.now(),
+      Timestamp: serverTimestamp(),
+      Task: task,
+    });
     setTask("");
   }
-  // const getTasks = () => {
-  //   db.collection("TodoTasks").onSnapshot((querySnapshot) => {
-  //     let result = querySnapshot.docs.map((doc) => ({
-  //       id: doc.id,
-  //       Task: doc.data().Task,
-  //       inProgress: doc.data().inProgress
-  //     }))
-  //     setTaskList(result);
-  //   })
-  // }
-  // console.log(taskList);
+  const getTasks = async () => {
+    const snapshot = await getDocs(taskCol);
+    if (snapshot.exists()) {
+      const docData = snapshot.data();
+      console.log(`data is ${JSON.stringify(docData)}`);
+
+      const result = snapshot.forEach((doc) => ({
+        id: doc.id,
+        Task: doc.data().Task,
+        inProgress: doc.data().inProgress
+      }))
+      setTaskList(result);
+    }
+  }
+  console.log(taskList);
 
   return (
     <div className="App">
